@@ -6,8 +6,16 @@ using DevBlah.DapperOrm.Helper.Attributes;
 
 namespace DevBlah.DapperOrm.Helper
 {
+    /// <summary>
+    /// Template class to create the class mapping for dapper extensions 
+    /// out of the specified attributes the entities are decorated with
+    /// </summary>
+    /// <typeparam name="T">type of the entity</typeparam>
     public class DapperExtensionClassMapper<T> : ClassMapper<T> where T : class
     {
+        /// <summary>
+        /// constructor
+        /// </summary>
         public DapperExtensionClassMapper()
         {
             // reflect template type
@@ -45,6 +53,7 @@ namespace DevBlah.DapperOrm.Helper
                 Map(keyField).Key(KeyType.Assigned);
             }
 
+            // ReSharper disable once DoNotCallOverridableMethodsInConstructor
             AutoMap();
         }
     }

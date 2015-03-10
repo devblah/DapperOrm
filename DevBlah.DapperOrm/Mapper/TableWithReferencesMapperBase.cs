@@ -8,12 +8,24 @@ using DevBlah.SqlExpressionBuilder;
 
 namespace DevBlah.DapperOrm.Mapper
 {
+    /// <summary>
+    /// base mapper class for mapping entities, which has several subentities included
+    /// </summary>
+    /// <typeparam name="TQuery">type of the query</typeparam>
+    /// <typeparam name="TResult">type of the entity</typeparam>
     public abstract class TableWithReferencesMapperBase<TQuery, TResult> : SqlMapperBase<TQuery, TResult>
         where TQuery : QueryBase
         where TResult : class
     {
+        /// <summary>
+        /// list of referenced tables
+        /// </summary>
         private List<ReferenceTable> _referenceTables = new List<ReferenceTable>();
 
+        /// <summary>
+        /// constructor
+        /// </summary>
+        /// <param name="connectionString"></param>
         protected TableWithReferencesMapperBase(string connectionString)
             : base(connectionString)
         {
@@ -21,6 +33,11 @@ namespace DevBlah.DapperOrm.Mapper
             _DetermineTable(resultType);
         }
 
+        /// <summary>
+        /// Builds the select string for the entity and all references
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
         protected override SqlExpressionBuilderSelect BuildSelect(TQuery query)
         {
             var type = typeof(TResult);
@@ -41,10 +58,23 @@ namespace DevBlah.DapperOrm.Mapper
             return builder;
         }
 
-        protected virtual void SqlBuilderSelectByType(ISqlExpressionBuilder builder, Table table, Type type, TQuery query)
-        {
-        }
+        /// <summary>
+        /// Method to create the select string according to the used types of the current entity and all references.
+        /// Is called while the sql query is builded.
+        /// </summary>
+        /// <param name="builder">current instance of the sql expression builder</param>
+        /// <param name="table">table where selectable fields should be determined</param>
+        /// <param name="type">type of the entity where selectable fields should be determined</param>
+        /// <param name="query">type of the dependant query</param>
+        protected virtual void SqlBuilderSelectByType(ISqlExpressionBuilder builder, Table table, Type type,
+            TQuery query)
+        { }
 
+        /// <summary>
+        /// gets the references out of the decorating attributes
+        /// </summary>
+        /// <param name="entityType">type of the entity</param>
+        /// <param name="table">table which belongs to the current entity</param>
         private void _DetermineReferences(Type entityType, Table table)
         {
             IEnumerable<PropertyInfo> propertyInfos = entityType.GetProperties()
@@ -79,6 +109,10 @@ namespace DevBlah.DapperOrm.Mapper
             }
         }
 
+        /// <summary>
+        /// Gets the table from the TableWithReferencesAttribute decorating the current entitiy
+        /// </summary>
+        /// <param name="entityType"></param>
         private void _DetermineTable(Type entityType)
         {
             if (entityType.CustomAttributes.All(x => x.AttributeType != typeof(TableWithReferencesAttribute)))
@@ -97,6 +131,10 @@ namespace DevBlah.DapperOrm.Mapper
             _DetermineReferences(entityType, new Table(tableAttribute.Name, tableAttribute.Alias));
         }
 
+        /// <summary>
+        /// Class, which represents all attributes of a reference
+        /// Only used internally
+        /// </summary>
         internal class ReferenceTable
         {
             public Table Table { get; set; }
