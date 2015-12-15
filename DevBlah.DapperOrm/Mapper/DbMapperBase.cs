@@ -268,6 +268,7 @@ namespace DevBlah.DapperOrm.Mapper
         /// <param name="connectionString"></param>
         /// <returns></returns>
         protected abstract TDbConnection CreateConnection(string connectionString);
+
         /// <summary>
         /// does all initialisations and queries the db with the given function
         /// </summary>
